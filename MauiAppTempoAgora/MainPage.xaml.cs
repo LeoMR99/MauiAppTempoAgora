@@ -17,6 +17,11 @@ namespace MauiAppTempoAgora
         {
             try
             {
+                if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
+                {
+                    await DisplayAlert("Erro", "Sem conexão com a internet. Verifique sua conexão.", "OK");
+                }
+
                 if(!string.IsNullOrEmpty(txt_cidade.Text))
                 {
                     Tempo? t = await DataService.GetPrevisao(txt_cidade.Text);
@@ -30,7 +35,10 @@ namespace MauiAppTempoAgora
                             $"Nascer do Sol {t.sunrise} \n" +
                             $"Por do Sol: {t.sunset} \n" +
                             $"Temp Máx: {t.temp_max} \n" +
-                            $"Temp Min: {t.temp_min} \n";
+                            $"Temp Min: {t.temp_min} \n" +
+                            $"Descrição Textual do Clima: {t.description} \n" +
+                            $"Velocidade do Vento: {t.speed} \n" +
+                            $"Visibilidade: {t.visibility} \n";
 
 
                         lbl_res.Text = dados_previsao;
@@ -38,15 +46,26 @@ namespace MauiAppTempoAgora
                     }
                     else
                     {
-                        lbl_res.Text = "Sem dados de Previsão";
+                        await DisplayAlert("Erro", "Cidade não encontrada", "OK");
                     }
                 }
             }
-            catch (Exception ex)
+            catch (HttpRequestException ex)
             {
-                await DisplayAlert("Ops", ex.Message, "OK");
+                if (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    await DisplayAlert("Erro", "Cidade não encontrada", "OK");
+                }
+                else
+                {
+                    await DisplayAlert("Erro", $"Erro na requisição: {ex.Message}", "OK");
+                }
+            }
+            catch (Exception ex) 
+            {
+                await DisplayAlert("Ops", $"Ocorreu um erro inesperado: {ex.Message}", "OK");
             }
         }
-    }
-
-}
+                
+            }
+        }    
