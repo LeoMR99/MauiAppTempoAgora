@@ -55,11 +55,7 @@ namespace MauiAppTempoAgora
                 if (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
                     await DisplayAlert("Erro", "Cidade não encontrada", "OK");
-                }
-                else
-                {
-                    await DisplayAlert("Erro", $"Erro na requisição: {ex.Message}", "OK");
-                }
+                }                
             }
             catch (Exception ex) 
             {
